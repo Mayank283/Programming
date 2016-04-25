@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://camel.apache.org/schema/spring
+          http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/task 
+          http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+	<!-- multicast -->
+	<context:component-scan base-package="com.java" />
+
+	<camel:camelContext>
+		
+		<camel:route startupOrder="10">
+			<camel:from uri="direct:start" />
+			<camel:log message="Main route: Send '${body}' to multicast" />
+			<camel:multicast>
+			<camel:to uri="direct:tap1"  />
+			<camel:to uri="direct:tap2"  />
+			</camel:multicast>
+			<camel:log message="Main route: Add 'PhraseOne' to '${body}'" />
+			<camel:bean ref="myBean" method="addPhraseOne" />
+			<camel:log message="Main route: Output '${body}'" />
+		</camel:route>
+
+		<camel:route>
+			<camel:from uri="direct:tap1" />
+			<camel:setHeader headerName="threadName">
+			<camel:simple>${threadName}</camel:simple>
+			</camel:setHeader>
+			<camel:log message="Tap1 Wire route: received '${body}'" />
+			<camel:log message="Tap1 Wire route: Add 'PhraseTwo' to '${body}'" />
+			<camel:bean ref="myBean" method="addPhraseTwo" />
+			<camel:log message="Tap1 Wire route: Output '${body}'" />
+		</camel:route>
+		
+		<camel:route>
+			<camel:from uri="direct:tap2" />
+			<camel:setHeader headerName="threadName">
+			<camel:simple>${threadName}</camel:simple>
+			</camel:setHeader>
+			<camel:log message="Tap2 Wire route: received '${body}'" />
+			<camel:log message="Tap2 Wire route: Add 'PhraseThree' to '${body}'" />
+			<camel:bean ref="myBean" method="addPhraseThree" />
+			<camel:log message="Tap2 Wire route: Output '${body}'" />
+		</camel:route>
+
+
+	</camel:camelContext>
+
+
+	<bean id="client" class="com.java.client.ClientFour" />
+
+</beans>

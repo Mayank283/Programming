@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://camel.apache.org/schema/spring
+          http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/task 
+          http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.acc" />
+
+	<camel:camelContext>
+
+		<camel:route startupOrder="10">
+			<camel:from uri="timer:foo?period=1s&amp;repeatCount=20" />
+			<camel:transform>
+				<camel:simple>${date:now:yyyy-MM-dd HH:mm:ss}</camel:simple>
+			</camel:transform>
+			<camel:to uri="seda:prefixBodyWithHello" />
+		</camel:route>
+
+		<camel:route startupOrder="20">
+			<camel:from uri="seda:prefixBodyWithHello" />
+			<camel:choice>
+				<camel:when>
+					<camel:simple>${body} contains 'Camel'</camel:simple>
+					<camel:log message="Camel ${body}" />
+					<camel:to uri="stream:out" />
+				</camel:when>
+				<camel:otherwise>
+					<camel:log message="Other ${body}" />
+				</camel:otherwise>
+			</camel:choice>
+			<camel:to uri="stream:out" />
+		</camel:route>
+
+
+	</camel:camelContext>
+
+
+	<bean id="client" class="com.acc.Client" />
+
+
+</beans>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://camel.apache.org/schema/spring
+          http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/task 
+          http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.acc" />
+
+	<!-- Database Connection for derby DB -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="org.apache.derby.jdbc.EmbeddedDriver" />
+		<property name="url" value="jdbc:derby:C:\Users\khoyendra.pande\MyDB;create=true" />
+		<property name="username" value="derby" />
+		<property name="password" value="derby" />
+	</bean>
+	
+	<!-- Database Connection for HSQL DB -->
+	<!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:derby:C:\Users\khoyendra.pande\MyDB;create=true" />
+		<property name="username" value="sa" />
+		<property name="password" value="" />
+	</bean> -->
+	
+	<!-- bean which creates/destroys the database table for this example -->	
+	<bean id="sql" class="org.apache.camel.component.sql.SqlComponent">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+		
+	<camel:camelContext>
+
+		<camel:route id="insertUserRecord-route">
+			<camel:from uri="timer://timer1?period=2s" />
+			<!-- <camel:setBody>
+				<camel:constant>
+					SELECT * FROM DERBYTEST.users WHERE name='joel'
+				</camel:constant>
+			</camel:setBody> -->
+			<!--  camel:to uri="sql:dataSource" /-->
+			<!-- <camel:from uri="sql:SELECT * FROM DERBYTEST.users"/> -->
+			
+			<!-- <camel:to uri="sql:DELETE FROM DERBYTEST.users WHERE name='alex'"/> -->
+			
+			<camel:to uri="sql:INSERT INTO DERBYTEST.users values (3, 'Raju', 'Raju@yahoo.com')"/>
+			<camel:log message="DATA .............................."/>
+			<camel:log message="DATA ---------------------- ${body}"/>
+			<!-- camel:to uri="stream:out"/-->
+		</camel:route>
+	</camel:camelContext>
+
+<bean id="client" class="com.acc.database.CamelDataBaseClient"/>
+</beans>

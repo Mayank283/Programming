@@ -1,0 +1,13 @@
+<hibernate-mapping>
+ 
+    <class name="com.acc.hibernate.pojo.Users" schema="DERBYTEST" table="users">
+ 
+        <id name="id">
+            <generator class="native"/>
+        </id>
+ 
+        <property name="name" length="100"/>
+        <property name="email" length="100"/>
+    </class>
+ 
+</hibernate-mapping>

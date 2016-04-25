@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="WebContent"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Spring">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/camel-db"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ActiveMQ"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Camel"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jersey"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/cxf-jars"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/hibernate"/>
+	<classpathentry kind="lib" path="/home/mayank/Downloads/dom4j-1.6.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/mayank/Downloads/org.eclipse.jetty.util.jar"/>
+	<classpathentry kind="lib" path="/home/mayank/Downloads/jetty-server-9.0.0.rc0.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>

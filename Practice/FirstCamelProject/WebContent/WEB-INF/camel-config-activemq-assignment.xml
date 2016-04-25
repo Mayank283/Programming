@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://camel.apache.org/schema/spring
+          http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/task 
+          http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.acc" />
+<!-- 
+	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+		<property name="brokerURL" value="vm://localhost" />
+	</bean> -->
+	
+		
+		    
+	<camel:camelContext>
+	
+		<camel:route>
+			<camel:from uri="direct:invoice" />
+			<camel:log message="Filter bills for US"/>
+			<camel:log message="LOCATION==========: ${body}" />
+			<camel:bean ref="bill" method="checkLocation"/>
+		</camel:route>
+	
+		<!-- <camel:route>
+			<camel:from uri="direct:invoice" />
+			<camel:split streaming="true">
+	           	<camel:simple>${body}</camel:simple>
+	           	<camel:convertBodyTo type="com.acc.wiretap.beans.Bill" /> 
+	           	<camel:log message="\n\t########\n\tCleanupMigrated file each: 1 ${body}" />
+		       	<camel:filter>
+	           		<camel:method ref="filter" method="matches"/>
+	           			<camel:to uri="activemq:queue:Queue0"/>
+	           	</camel:filter>
+        	</camel:split>
+		</camel:route>
+
+		<camel:route>
+			<camel:from uri="activemq:queue:Queue0" />
+			<camel:log message="Filter bills for US"/>
+			<camel:log message="LOCATION==========: ${body}" />
+			<camel:bean ref="bill" method="checkLocation"/>
+			<camel:to uri="activemq:queue:Queue1"/>
+		</camel:route>
+
+		<camel:route>
+			<camel:from uri="activemq:queue:Queue1" />
+			<camel:log message="Transferring bill to queue1"/>
+			<camel:log message="QUEUE-1==========: ${body}" />
+			<camel:bean ref="bill" method="updateStatus"/>
+			<camel:to uri="stream:out"/>
+		</camel:route>
+		
+		<camel:route>
+			<camel:from uri="activemq:queue:Queue2" />
+			<camel:log message="Transferring bill to queue2"/>
+			<camel:log message="QUEUE-2==========: ${body}" />
+			<camel:bean ref="bill" method="updateStatus"/>
+			<camel:to uri="stream:out"/>
+		</camel:route> -->
+
+	</camel:camelContext>
+
+
+	<bean id="client" class="com.acc.assignment.CamelActiveMqAssignmentClient"/>
+	<bean id="bill" class="com.acc.wiretap.beans.Bill"/>
+	<bean id="filter" class="com.acc.wiretap.util.MyFilter"/>
+
+</beans>

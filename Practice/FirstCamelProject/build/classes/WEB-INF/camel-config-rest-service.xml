@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    	    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	        http://camel.apache.org/schema/spring
+          	http://camel.apache.org/schema/spring/camel-spring.xsd
+          	http://www.springframework.org/schema/task 
+          	http://www.springframework.org/schema/task/spring-task.xsd
+           	http://www.springframework.org/schema/context 
+           	http://www.springframework.org/schema/context/spring-context.xsd
+           	http://camel.apache.org/schema/cxf
+           	http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+
+		<!-- webservice -> address: uri of webservice, service class:the interface 
+		class that was generated from the WSDL -->
+
+
+	<cxf:cxfEndpoint id="userServiceEndpoint"
+		address="http://localhost:8080/UserManagement/rest/UserService/users"
+		serviceClass="com.acc.hibernate.pojo.Users" />
+
+	<bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider"/>
+ 
+  	<bean id="customerService" class="com.acc.hibernate.pojo.Users" />
+		 
+	<!-- Defined the server endpoint to create the cxf-rs consumer -->
+	  <cxf:rsServer id="rsServer" address="http://localhost:8080/UserManagement/rest/UserService/users"
+	    serviceClass="com.acc.hibernate.pojo.Users" 
+	    loggingFeatureEnabled="true" loggingSizeLimit="20">
+	    <cxf:providers>
+	       <ref bean="jsonProvider"/>
+	    </cxf:providers>
+	  </cxf:rsServer>
+	 
+	  <!-- Defined the client endpoint to create the cxf-rs consumer -->
+	 <!--  <cxf:rsClient id="rsClient" address="http://localhost:8080/UserManagement/rest/UserService/users"
+	    serviceClass="com.acc.hibernate.pojo.Users"
+	    loggingFeatureEnabled="true">
+	    <cxf:providers>
+	       <ref bean="jsonProvider"/>
+	    </cxf:providers>
+	  </cxf:rsClient> -->
+	  
+	<camel:camelContext>
+			<camel:route>
+				<!-- <camel:from uri="direct:start" />
+				<camel:log message="${body}" />
+				<camel:to uri="cxf:bean:userServiceEndpoint?defaultOperationName=users" /> -->
+				
+				<camel:from uri="cxfrs://bean://rsServer"/>
+				<camel:log message="${body}" />
+	      		<!-- <camel:to uri="log:body?level=INFO"/>
+	      		<camel:to uri="cxfrs://bean://rsClient?ignoreDeleteMethodMessageBody=true"/> -->
+	      		
+	      		<!-- <camel:from uri="cxf:bean:userServiceEndpoint" />
+				<camel:transform>
+					<camel:simple>${in.body}</camel:simple>
+				</camel:transform>
+				<camel:log message="request = ${body}" />
+				<camel:bean ref="paymentServiceImpl" />
+				<camel:log message="response = ${body}" /> -->
+			</camel:route>
+	</camel:camelContext>
+
+	<bean id="client" class="com.acc.restsrv.CamelRestWSClient" />
+</beans>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://camel.apache.org/schema/spring
+          http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/task 
+          http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.acc" />
+
+	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+		<property name="brokerURL" value="vm://localhost" />
+	</bean>
+	
+	<camel:camelContext>
+
+		<camel:route>
+			<camel:from uri="timer:foo?period=1s" />
+			<camel:transform>
+				<camel:simple>${date:now:yyyy-MM-dd HH:mm:ss}</camel:simple>
+			</camel:transform>
+			<camel:to uri="activemq:queue:Queue1"/>
+		</camel:route>
+		
+		<camel:route>
+			<camel:from uri="activemq:queue:Queue1" />
+			<camel:log message="Transferring data to queue2 from queue1"></camel:log>
+			<camel:inOut uri="activemq:queue:Queue2"/>
+		</camel:route>
+
+	</camel:camelContext>
+
+
+<bean id="client" class="com.acc.activemq.CamelActiveMQClient"/>
+</beans>

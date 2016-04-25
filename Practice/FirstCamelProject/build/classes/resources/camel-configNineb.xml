@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://camel.apache.org/schema/spring
+          http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/task 
+          http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+	<!-- xml to java object -->
+	<context:component-scan base-package="com.java" />
+	<camel:camelContext>
+		<camel:dataFormats>
+			<!-- path to jaxb annotated class -->
+			<camel:jaxb id="invoiceJaxb" contextPath="com.java.bean"
+				prettyPrint="true" />
+		</camel:dataFormats>
+		<camel:route>
+			<camel:from uri="direct:invoice" />
+			<camel:marshal ref="invoiceJaxb" />
+			<camel:log message=" ${body}" />
+			<camel:to uri="file://src/resources?fileName=One.xml"/>
+		</camel:route>
+	</camel:camelContext>
+
+
+	<bean id="client" class="com.java.client.ClientNineb" />
+
+</beans>

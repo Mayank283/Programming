@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://camel.apache.org/schema/spring
+          http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/task 
+          http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://camel.apache.org/schema/cxf
+           http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+	<!-- webservice -> address: uri of webservice, service class:the interface 
+		class that was generated from the WSDL -->
+
+
+	<bean id="connectionFactoryOracleAQQueue" class="oracle.jms.AQjmsFactory"
+		factory-method="getQueueConnectionFactory">
+
+		<constructor-arg index="0">
+			<value>jdbc:oracle:thin:@(DESCRIPTION= (ADDRESS= (PROTOCOL=TCP)
+				(HOST=host.org.com) (PORT=1521)) (CONNECT_DATA= (SID=test)))</value>
+		</constructor-arg>
+		<constructor-arg index="1" type="java.util.Properties">
+			<value></value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="oracleQueueCredentials"
+		class="org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter">
+		<property name="targetConnectionFactory">
+			<ref bean="connectionFactoryOracleAQQueue" />
+		</property>
+		<property name="username">
+			<value>system</value>
+		</property>
+		<property name="password">
+			<value>oracle</value>
+		</property>
+	</bean>
+
+	<bean id="oracleQueue" class="org.apache.camel.component.jms.JmsComponent">
+		<property name="connectionFactory" ref="oracleQueueCredentials" />
+	</bean>
+
+<camel:camelContext>
+	<camel:route>
+		<camel:from uri="direct:start" />
+		<camel:log message="${body}" />
+		<camel:to
+			uri="cxf:bean:paymentServiceEndpoint?defaultOperationName=transferFunds" />
+	</camel:route>
+
+</camel:camelContext>
+
+<bean id="client" class="com.java.client.ClientSixteen" />
+
+</beans>

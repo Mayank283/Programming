@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://camel.apache.org/schema/spring
+          http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/task 
+          http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+	<!-- multicast -->
+	<context:component-scan base-package="com.acc" />
+
+	<camel:camelContext>
+		
+		<camel:dataFormats>
+			<camel:jaxb id="studentJaxb" contextPath="com.acc.wiretap.beans" prettyPrint="true"/>
+		</camel:dataFormats>
+		
+		<camel:route>
+			<camel:from uri="direct:invoice" />
+			<camel:log message="1 ${body}" />
+			<!-- camel:marshal ref="studentJaxb" /-->
+			<camel:marshal>
+				<camel:json library="XStream"/>
+			</camel:marshal >
+			<camel:log message="3 ${body}" />
+			<camel:to uri="file://C:/Users/khoyendra.pande/Documents?fileName=R.json" />
+		</camel:route>
+		
+
+		<camel:route>
+			<camel:from uri="file://C:/Users/khoyendra.pande/Documents?fileName=R.json" />
+			<!-- camel:unmarshal ref="studentJaxb"/-->
+			<camel:unmarshal ref="studentJaxb">
+				<camel:json library="XStream" unmarshalTypeName="com.acc.wiretap.beans.StudentXml"/>
+			</camel:unmarshal>
+			
+			<camel:log message="3 ${body}" />
+			<camel:to uri="stream:out" />
+		</camel:route>
+		
+	</camel:camelContext>
+
+
+	<bean id="client" class="com.acc.marshaller.CamelMashallerClient"/>
+
+</beans>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:task="http://www.springframework.org/schema/task" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+         http://camel.apache.org/schema/spring
+          http://camel.apache.org/schema/spring/camel-spring.xsd
+          http://www.springframework.org/schema/task 
+          http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.java" />
+<!-- Logging error handler -->
+<camel:errorHandler id="myErrorHandler" type="DefaultErrorHandler"  retryWhileRef="myRetryPredicate"/>
+	<camel:camelContext  errorHandlerRef="myErrorHandler" trace="true">
+	
+		<camel:route>  <!-- errorHandlerRef="myErrorHandler" -->
+			<camel:from uri="file://src/resources?fileName=bookstore.xml" />
+			<camel:split>
+				<camel:xpath>//book/[@category='WEB']/author/text()</camel:xpath>
+				<camel:log message="Main route: '${body}'" />
+				</camel:split>
+			<camel:to uri="stream:out"/>
+		</camel:route>
+	</camel:camelContext>
+
+<bean id="client" class="com.java.client.ClientEleven"/>
+</beans>
