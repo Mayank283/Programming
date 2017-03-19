@@ -9,7 +9,6 @@ public class Binatest {
 		Scanner in = new Scanner(System.in);
 		x = in.nextInt();
 		bina.Binary(x);
-		// TODO Auto-generated method stub
 		in.close();
 	}
 
